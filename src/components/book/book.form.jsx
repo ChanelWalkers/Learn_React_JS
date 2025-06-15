@@ -1,6 +1,7 @@
-import { Button, Cascader, Input, InputNumber, Modal, notification, Select } from "antd";
+import { Button, Cascader, Input, InputNumber, Modal, notification, Select, Form, message } from "antd";
 import { useState } from "react";
 import { createBookAPI, uploadFileAPI } from "../../services/api.service";
+import { useForm } from "antd/es/form/Form";
 
 const BookForm = (props) => {
     const [mainText, setMainText] = useState("");
@@ -9,6 +10,8 @@ const BookForm = (props) => {
     const [author, setAuthor] = useState("");
     const [category, setCategory] = useState("")
     const [thumbnail, setThumbnail] = useState("");
+
+    const [form] = Form.useForm();
 
     const [selectedFile, setSelectedFile] = useState();
     const [preview, setPreview] = useState();
@@ -32,15 +35,18 @@ const BookForm = (props) => {
 
     const resetAndClose = () => {
         setIsAddModalOpen(false);
-        setAuthor("");
-        setQuantity(0);
-        setPrice(0);
-        setCategory("");
+        // setAuthor("");
+        // setQuantity(0);
+        // setPrice(0);
+        // setCategory("");
+        form.resetFields();
         setPreview();
         setSelectedFile();
     }
 
-    const handleSubmitBtn = async () => {
+    const handleSubmitBtn = async (values) => {
+        const { mainText, author, price, quantity, category } = values;
+
         const resUpload = await uploadFileAPI(selectedFile, "book");
         if (resUpload.data) {
             const newAvatar = resUpload.data.fileUploaded;
@@ -73,35 +79,78 @@ const BookForm = (props) => {
             <Modal
                 open={isAddModalOpen}
                 // onOk={}
-                onCancel={() => setIsAddModalOpen(false)}
-                onClose={() => setIsAddModalOpen(false)}
+                onCancel={() => resetAndClose()}
+                onClose={() => resetAndClose()}
                 maskClosable={false}
-                onOk={handleSubmitBtn}
+                onOk={() => form.submit()}
                 okText={"CREATE"}
                 title={"Create Book"}
             >
-                <div style={{ display: "flex", gap: "15px", flexDirection: "column", padding: "24px" }}>
-                    <div>
-                        <span>Title</span>
-                        <Input value={mainText} onChange={(e) => setMainText(e.target.value)} />
-                    </div>
-                    <div>
-                        <span>Author</span>
-                        <Input value={author} onChange={(e) => setAuthor(e.target.value)} />
-                    </div>
-                    <div>
-                        <span>Price</span><br />
-                        <InputNumber style={{ width: '420px' }} addonAfter={"₫"} value={price} onChange={(value) => setPrice(value)} />
-                    </div>
-                    <div>
-                        <span>Quantity</span>
-                        <InputNumber style={{ width: '420px' }} value={quantity} onChange={(value) => setQuantity(value)} />
-                    </div>
-                    <div>
-                        <span>Category</span><br />
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={handleSubmitBtn}
+                >
+                    <Form.Item
+                        label={"Title"}
+                        name={'mainText'}
+                        rules={[
+                            {
+                                required: 'true',
+                                message: 'Please input title'
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label={"Author"}
+                        name={'author'}
+                        rules={[
+                            {
+                                required: 'true',
+                                message: 'Please input author'
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label={"Price"}
+                        name={'price'}
+                        rules={[
+                            {
+                                required: 'true',
+                                message: 'Please input price'
+                            },
+                        ]}
+                    >
+                        <InputNumber style={{ width: '100%' }} />
+                    </Form.Item>
+                    <Form.Item
+                        label={"Quantity"}
+                        name={'quantity'}
+                        rules={[
+                            {
+                                required: 'true',
+                                message: 'Please input quantity'
+                            },
+                        ]}
+                    >
+                        <InputNumber style={{ width: '100%' }} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label={"Category"}
+                        name={'category'}
+                        rules={[
+                            {
+                                required: 'true',
+                                message: 'Please input category'
+                            },
+                        ]}
+                    >
                         <Select
-                            style={{ width: 420 }}
-                            value={category}
                             options={[
                                 { value: 'Arts', label: 'Arts' },
                                 { value: 'Business', label: 'Business' },
@@ -117,12 +166,14 @@ const BookForm = (props) => {
                                 { value: 'Travel', label: 'Travel' },
 
                             ]}
-                            onChange={(value) => setCategory(value)}
                         />
-                    </div>
+                    </Form.Item>
+
+
+
                     <div>
                         <label htmlFor="btnUpload" style={style}>Upload Avatar</label>
-                        <input type="file" hidden id="btnUpload" onChange={(e) => handleOnChangeFile(e)} />
+                        <input type="file" hidden id="btnUpload" onChange={(e) => handleOnChangeFile(e)} style={{ display: 'none' }} />
                     </div>
                     {
                         preview &&
@@ -134,7 +185,7 @@ const BookForm = (props) => {
                             {/* <Button type="primary">Save</Button> */}
                         </>
                     }
-                </div>
+                </Form>
             </Modal>
 
         </div>
