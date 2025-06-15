@@ -8,7 +8,6 @@ const BookForm = (props) => {
     const [quantity, setQuantity] = useState(0);
     const [author, setAuthor] = useState("");
     const [category, setCategory] = useState("")
-    const [thumbnail, setThumbnail] = useState("");
 
     const [selectedFile, setSelectedFile] = useState();
     const [preview, setPreview] = useState();
@@ -25,6 +24,7 @@ const BookForm = (props) => {
 
         // hinh anh luu tru trong memory trinh duyet
         const file = event.target.files[0];
+        console.log(file)
         if (file) {
             setSelectedFile(file);
             setPreview(URL.createObjectURL(file));
@@ -102,7 +102,7 @@ const BookForm = (props) => {
                     <div>
                         <span>Category</span><br />
                         <Select
-                            style={{ width: 420 }}
+                            style={{ width: '100%' }}
                             value={category}
                             options={[
                                 { value: 'Arts', label: 'Arts' },
@@ -128,7 +128,6 @@ const BookForm = (props) => {
                     </div>
                     {
                         preview &&
-
                         <>
                             <div style={{ marginTop: '10px', height: '100px', width: '150px', marginBottom: '15px' }}>
                                 <img style={{ height: '100%', width: '100%', objectFit: 'contain' }} src={preview} />

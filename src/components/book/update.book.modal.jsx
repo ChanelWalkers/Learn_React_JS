@@ -1,34 +1,35 @@
-import { Modal, Input, InputNumber, Select, notification, message } from "antd";
+import { Modal, Input, InputNumber, Select, notification, message, Form } from "antd";
 import { useEffect, useState } from "react";
 import { updateBookAPI, uploadFileAPI } from "../../services/api.service";
 
 const ModalUpdateBook = (props) => {
     const { dataUpdate, isModalUpdateOpen, setIsModalUpdateOpen, loadBook } = props;
 
-    const [id, setId] = useState("");
-    const [mainText, setMainText] = useState("");
-    const [price, setPrice] = useState(0);
-    const [quantity, setQuantity] = useState(0);
-    const [author, setAuthor] = useState("");
-    const [category, setCategory] = useState("")
     const [thumbnail, setThumbnail] = useState();
     const [selectedFile, setSelectedFile] = useState();
 
+
+    const [form] = Form.useForm();
+
     const resetAndCloseModal = () => {
-        setMainText("");
-        setAuthor("");
-        setPrice("");
-        setQuantity("");
-        setCategory("");
-        setSelectedFile(null);
-        setThumbnail(null);
-        setId("");
+        form.resetFields();
         setIsModalUpdateOpen(false);
     }
 
 
 
-    const handleOk = async () => {
+    const handleOk = async (values) => {
+        const { id, author, category, price, quantity, mainText } = values;
+
+        const data = {
+            id: id,
+            author: author,
+            category: category,
+            price: price,
+            quantity: quantity,
+            mainText: mainText,
+        }
+
         if (!thumbnail && !selectedFile) {
             notification.error({
                 message: "Error update book",
@@ -54,11 +55,12 @@ const ModalUpdateBook = (props) => {
             }
         }
 
-        await updateBook(newThumbnail);
+        await updateBook(data, newThumbnail);
 
     };
 
-    const updateBook = async (newThumbnail) => {
+    const updateBook = async (data, newThumbnail) => {
+        const { id, author, category, price, quantity, mainText } = data;
         const res = await updateBookAPI(id, author, mainText, price, quantity, category, newThumbnail);
         if (res.data) {
             message.success('Update book successfully');
@@ -94,13 +96,15 @@ const ModalUpdateBook = (props) => {
 
     useEffect(() => {
         if (dataUpdate && dataUpdate._id) {
-            setId(dataUpdate._id);
-            setAuthor(dataUpdate.author);
-            setPrice(dataUpdate.price);
-            setMainText(dataUpdate.mainText);
-            setQuantity(dataUpdate.quantity);
-            setCategory(dataUpdate.category);
-            setThumbnail(`${import.meta.env.VITE_BACKEND_URL}/images/book/${dataUpdate.thumbnail}`)
+            form.setFieldsValue({
+                id: dataUpdate._id,
+                mainText: dataUpdate.mainText,
+                author: dataUpdate.author,
+                price: dataUpdate.price,
+                quantity: dataUpdate.quantity,
+                category: dataUpdate.category,
+            })
+            setThumbnail(`${import.meta.env.VITE_BACKEND_URL}/images/book/${dataUpdate.thumbnail}`);
         }
     }, [dataUpdate])
 
@@ -109,36 +113,91 @@ const ModalUpdateBook = (props) => {
             title="Update Book - Controlled Component"
             closable={{ 'aria-label': 'Custom Close Button' }}
             open={isModalUpdateOpen}
-            onOk={handleOk}
+            onOk={() => form.submit()}
             onCancel={handleCancel}
-            okText={"Update"}
-        >
-            <div style={{ display: "flex", gap: "15px", flexDirection: "column", padding: "24px" }}>
-                <div>
-                    <span>Id</span>
-                    <Input value={id} disabled />
-                </div>
-                <div>
-                    <span>Title</span>
-                    <Input value={mainText} onChange={(e) => setMainText(e.target.value)} />
-                </div>
-                <div>
-                    <span>Author</span>
-                    <Input value={author} onChange={(e) => setAuthor(e.target.value)} />
-                </div>
-                <div>
-                    <span>Price</span><br />
-                    <InputNumber style={{ width: '100%' }} addonAfter={"₫"} value={price} onChange={(value) => setPrice(value)} />
-                </div>
-                <div>
-                    <span>Quantity</span><br />
-                    <InputNumber style={{ width: '100%' }} value={quantity} onChange={(value) => setQuantity(value)} />
-                </div>
-                <div>
-                    <span>Category</span><br />
+            okText={"Update"}>
+
+            <Form
+                layout="vertical"
+                form={form}
+                onFinish={handleOk}
+            >
+
+
+                <Form.Item
+                    label="Id"
+                    name={"id"}
+                >
+                    <Input disabled />
+                </Form.Item>
+                <Form.Item
+                    label="Title"
+                    name={"mainText"}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input title'
+                        }
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+
+                <Form.Item
+                    label="Author"
+                    name={"author"}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input author'
+                        }
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+
+                <Form.Item
+                    label="Price"
+                    name={"price"}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input price'
+                        }
+                    ]}
+                >
+                    <InputNumber style={{ width: '100%' }} />
+                </Form.Item>
+
+
+                <Form.Item
+                    label="Quantity"
+                    name={"quantity"}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input quantity'
+                        }
+                    ]}
+                >
+                    <InputNumber style={{ width: '100%' }} />
+                </Form.Item>
+
+
+                <Form.Item
+                    label="Category"
+                    name={"category"}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input category'
+                        }
+                    ]}
+                >
                     <Select
                         style={{ width: '100%' }}
-                        value={category}
                         options={[
                             { value: 'Arts', label: 'Arts' },
                             { value: 'Business', label: 'Business' },
@@ -154,9 +213,9 @@ const ModalUpdateBook = (props) => {
                             { value: 'Travel', label: 'Travel' },
 
                         ]}
-                        onChange={(value) => setCategory(value)}
                     />
-                </div>
+                </Form.Item>
+
                 <div>
                     <span>Thumbnail: </span>
                     {
@@ -171,9 +230,9 @@ const ModalUpdateBook = (props) => {
                 </div>
                 <div>
                     <label htmlFor="btnUpload" style={style}>Upload Avatar</label>
-                    <input type="file" hidden id="btnUpload" onChange={(e) => handleOnChangeFile(e)} />
+                    <input type="file" hidden id="btnUpload" onChange={(e) => handleOnChangeFile(e)} style={{ display: 'none' }} />
                 </div>
-            </div>
+            </Form>
         </Modal>
     )
 
