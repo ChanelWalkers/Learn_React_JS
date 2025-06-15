@@ -9,7 +9,9 @@ const BookPage = () => {
     const [pageSize, setPageSize] = useState(5);
     const [total, setTotal] = useState(0);
 
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    useEffect(() => {
+        fetchDataBook();
+    }, [pageSize, current])
 
     const fetchDataBook = async () => {
         const res = await fetchAllBookAPI(current, pageSize);
@@ -18,19 +20,13 @@ const BookPage = () => {
             setCurrent(res.data.meta.current);
             setPageSize(res.data.meta.pageSize);
             setTotal(res.data.meta.total);
-            console.log(res.data);
         }
     }
 
-    useEffect(() => {
-        fetchDataBook();
-    }, [pageSize, current])
 
     return (
         <div>
             <BookForm
-                isAddModalOpen={isAddModalOpen}
-                setIsAddModalOpen={setIsAddModalOpen}
                 loadBook={fetchDataBook}
             />
             <BookTable
@@ -40,6 +36,7 @@ const BookPage = () => {
                 total={total}
                 current={current}
                 pageSize={pageSize}
+                loadBook={fetchDataBook}
             />
         </div>
     )

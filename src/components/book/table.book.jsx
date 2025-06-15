@@ -2,12 +2,17 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Table, Space, Tag } from "antd";
 import { useState } from "react";
 import BookDetailModal from "./detail.book.modal";
+import ModalUpdateBook from "./update.book.modal";
 
 const BookTable = (props) => {
-    const { dataBooks, setCurrent, setPageSize, total, current, pageSize } = props;
+    const { dataBooks, setCurrent, setPageSize, total, current, pageSize, loadBook } = props;
 
+    const [dataUpdate, setDataUpdate] = useState(null);
 
     const [dataDetails, setDataDetails] = useState(null);
+
+    const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+
     const [isDetailModalOpen, setIsModalDetailOpen] = useState(false);
 
     const columns = [
@@ -56,7 +61,13 @@ const BookTable = (props) => {
                     display: 'flex',
                     gap: '20px'
                 }}>
-                    <EditOutlined style={{ cursor: 'pointer', color: '#fcc419' }} />
+                    <EditOutlined
+                        style={{ cursor: 'pointer', color: '#fcc419' }}
+                        onClick={() => {
+                            setDataUpdate(record);
+                            setIsModalUpdateOpen(true);
+                        }}
+                    />
                     <DeleteOutlined style={{ cursor: 'pointer', color: '#fa5252' }} />
                 </div>
             ),
@@ -97,6 +108,12 @@ const BookTable = (props) => {
                 dataDetails={dataDetails}
                 isDetailModalOpen={isDetailModalOpen}
                 setIsModalDetailOpen={setIsModalDetailOpen}
+            />
+            <ModalUpdateBook
+                dataUpdate={dataUpdate}
+                isModalUpdateOpen={isModalUpdateOpen}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                loadBook={loadBook}
             />
         </>
     )

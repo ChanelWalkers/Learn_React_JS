@@ -12,7 +12,8 @@ const BookForm = (props) => {
 
     const [selectedFile, setSelectedFile] = useState();
     const [preview, setPreview] = useState();
-    const { isAddModalOpen, setIsAddModalOpen, loadBook } = props;
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const { loadBook } = props;
 
 
     const handleOnChangeFile = (event) => {
