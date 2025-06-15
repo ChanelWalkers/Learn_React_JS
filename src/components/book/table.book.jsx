@@ -1,8 +1,9 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Table, Space, Tag } from "antd";
+import { Table, Space, Tag, message, notification, Popconfirm } from "antd";
 import { useState } from "react";
 import BookDetailModal from "./detail.book.modal";
 import ModalUpdateBook from "./update.book.modal";
+import { deleteBookAPI } from "../../services/api.service";
 
 const BookTable = (props) => {
     const { dataBooks, setCurrent, setPageSize, total, current, pageSize, loadBook } = props;
@@ -14,6 +15,19 @@ const BookTable = (props) => {
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
 
     const [isDetailModalOpen, setIsModalDetailOpen] = useState(false);
+
+    const handleDeleteBook = async (id) => {
+        const res = await deleteBookAPI(id);
+        if (res.data) {
+            message.success('Delete book successfully');
+            await loadBook();
+        } else {
+            notification.error({
+                message: 'Error Delete Book',
+                description: res.message,
+            })
+        }
+    }
 
     const columns = [
         {
@@ -68,7 +82,16 @@ const BookTable = (props) => {
                             setIsModalUpdateOpen(true);
                         }}
                     />
-                    <DeleteOutlined style={{ cursor: 'pointer', color: '#fa5252' }} />
+                    <Popconfirm
+                        placement="leftTop"
+                        title="Delete Book"
+                        description="Are you sure to delete this book?"
+                        onConfirm={() => handleDeleteBook(record._id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <DeleteOutlined style={{ cursor: 'pointer', color: '#fa5252' }} />
+                    </Popconfirm>
                 </div>
             ),
         },

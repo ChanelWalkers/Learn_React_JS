@@ -44,7 +44,7 @@ const ModalUpdateBook = (props) => {
         } else {
             const resUpload = await uploadFileAPI(selectedFile, 'book');
             if (resUpload.data) {
-                console.log(resUpload.data.fileUploaded)
+                // console.log(resUpload.data.fileUploaded)
                 newThumbnail = resUpload.data.fileUploaded;
             } else {
                 notification.error({
