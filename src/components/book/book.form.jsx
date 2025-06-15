@@ -12,7 +12,7 @@ const BookForm = (props) => {
 
     const [selectedFile, setSelectedFile] = useState();
     const [preview, setPreview] = useState();
-    const { isAddModalOpen, setIsAddModalOpen } = props;
+    const { isAddModalOpen, setIsAddModalOpen, loadBook } = props;
 
 
     const handleOnChangeFile = (event) => {
@@ -50,6 +50,7 @@ const BookForm = (props) => {
                     message: 'Success',
                     description: 'Create Book Successfully'
                 })
+                await loadBook();
                 resetAndClose();
             } else {
                 notification.error({

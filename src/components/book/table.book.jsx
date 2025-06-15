@@ -63,9 +63,24 @@ const BookTable = (props) => {
         },
     ];
 
+    const onChange = (pagination, filters, sorter, extra) => {
+        if (pagination && pagination.current) {
+            if (+pagination.current !== +current) {
+                setCurrent(+pagination.current)
+            }
+        }
+
+        if (pagination && pagination.pageSize) {
+            if (+pagination.pageSize !== +pageSize) {
+                setPageSize(+pagination.pageSize)
+            }
+        }
+    }
+
     return (
         <>
             <Table
+                rowKey={"_id"}
                 dataSource={dataBooks}
                 columns={columns}
                 pagination={
@@ -76,6 +91,7 @@ const BookTable = (props) => {
                         showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} of {total} rows</div>) }
                     }
                 }
+                onChange={onChange}
             />
             <BookDetailModal
                 dataDetails={dataDetails}

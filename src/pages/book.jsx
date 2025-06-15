@@ -24,13 +24,14 @@ const BookPage = () => {
 
     useEffect(() => {
         fetchDataBook();
-    }, [])
+    }, [pageSize, current])
 
     return (
         <div>
             <BookForm
                 isAddModalOpen={isAddModalOpen}
                 setIsAddModalOpen={setIsAddModalOpen}
+                loadBook={fetchDataBook}
             />
             <BookTable
                 dataBooks={dataBooks}
