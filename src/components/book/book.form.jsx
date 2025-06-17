@@ -14,6 +14,8 @@ const BookForm = (props) => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const { loadBook } = props;
 
+    const [isOkBtnLoading, setIsOkBtnLoading] = useState(false);
+
 
     const handleOnChangeFile = (event) => {
         if (!event.target.files || event.target.files.length === 0) {
@@ -42,6 +44,7 @@ const BookForm = (props) => {
     }
 
     const handleSubmitBtn = async () => {
+        setIsOkBtnLoading(true);
         const resUpload = await uploadFileAPI(selectedFile, "book");
         if (resUpload.data) {
             const newAvatar = resUpload.data.fileUploaded;
@@ -59,6 +62,7 @@ const BookForm = (props) => {
                     description: JSON.stringify(res.message),
                 })
             }
+            setIsOkBtnLoading(false);
         }
     }
 
@@ -79,6 +83,9 @@ const BookForm = (props) => {
                 onClose={() => setIsAddModalOpen(false)}
                 maskClosable={false}
                 onOk={handleSubmitBtn}
+                okButtonProps={{
+                    loading: isOkBtnLoading
+                }}
                 okText={"CREATE"}
                 title={"Create Book"}
             >

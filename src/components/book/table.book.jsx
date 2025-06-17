@@ -16,6 +16,8 @@ const BookTable = (props) => {
 
     const [isDetailModalOpen, setIsModalDetailOpen] = useState(false);
 
+    const [loadingTable, setLoadingTable] = useState(false);
+
     const handleDeleteBook = async (id) => {
         const res = await deleteBookAPI(id);
         if (res.data) {

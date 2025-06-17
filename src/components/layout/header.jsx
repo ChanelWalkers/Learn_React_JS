@@ -1,7 +1,7 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 // import './header.css'
 import { Menu, message } from 'antd';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { HomeOutlined, AuditOutlined, LoginOutlined, UsergroupAddOutlined, SettingOutlined, LogoutOutlined, AliwangwangOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/auth.context';
 import { logOutAPI } from '../../services/api.service';
@@ -10,9 +10,24 @@ import { logOutAPI } from '../../services/api.service';
 const Header = () => {
 
     const { user, setUser } = useContext(AuthContext);
+    const [current, setCurrent] = useState();
     // console.log('check data', user)
 
     const navigate = useNavigate();
+
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location && location.pathname) {
+            const allRoutes = ["users", "books"];
+            const currentRoute = allRoutes.find(item => `/${item}` === location.pathname);
+            if (currentRoute) {
+                setCurrent(currentRoute);
+            } else {
+                setCurrent('home');
+            }
+        }
+    }, [location]);
 
     const handleLogout = async () => {
         const res = await logOutAPI();
@@ -43,7 +58,7 @@ const Header = () => {
             icon: <UsergroupAddOutlined />,
         },
         {
-            label: <NavLink to={"/Books"}>Books</NavLink>,
+            label: <NavLink to={"/books"}>Books</NavLink>,
             key: 'books',
             icon: <AuditOutlined />,
         },
@@ -70,7 +85,6 @@ const Header = () => {
     ];
 
 
-    const [current, setCurrent] = useState('home');
     const onClick = e => {
         // console.log('click ', e);
         setCurrent(e.key);
